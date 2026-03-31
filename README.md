@@ -55,9 +55,12 @@ Only one timer can run at a time. Starting a new one stops the current one.
 
 > **Note:** The timer does not survive closing the browser tab or reloading the page. Always stop it before leaving.
 
-### Editing a patient's name
+### Editing or deleting a patient
 
-Tap **✏️** next to any patient, change the name, and tap **Save**.
+Tap **✏️** next to any patient to open the edit modal.
+
+- To rename: change the name and tap **Save**
+- To delete: tap **Delete** → confirm with **Yes, delete** — this removes the patient and all their sessions permanently
 
 ### Viewing session history
 
