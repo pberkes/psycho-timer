@@ -6,10 +6,10 @@
 2. Click **Add project**, give it a name (e.g. `psycho-timer`)
 3. Disable Google Analytics (not needed), click **Create project**
 
-## 2. Enable Google sign-in
+## 2. Enable Anonymous sign-in
 
 1. In your project, go to **Authentication → Sign-in method**
-2. Enable **Google**
+2. Enable **Anonymous**
 3. Add your GitHub Pages domain to **Authorized domains**
    - e.g. `yourusername.github.io`
 

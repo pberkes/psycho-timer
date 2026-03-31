@@ -1,5 +1,5 @@
 import { initializeApp }                          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+import { getAuth, signInAnonymously, onAuthStateChanged }
                                                    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, doc, addDoc, setDoc, deleteDoc, onSnapshot,
          query, orderBy, serverTimestamp, Timestamp }
@@ -59,24 +59,13 @@ function sessionsCol(pid)          { return collection(db, "users", currentUser.
 function sessionRef(pid, sid)      { return doc(db,   "users", currentUser.uid, "patients", pid, "sessions", sid); }
 
 // ── Auth ───────────────────────────────────────────────────────────────────
-$("btn-google-login").addEventListener("click", () => {
-  signInWithPopup(auth, new GoogleAuthProvider()).catch(console.error);
-});
-
-$("btn-logout").addEventListener("click", () => {
-  stopRunningTimer(false);
-  signOut(auth);
-});
-
 onAuthStateChanged(auth, user => {
-  currentUser = user;
   if (user) {
+    currentUser = user;
     subscribePatients();
     showScreen("screen-main");
   } else {
-    if (unsubPatients) { unsubPatients(); unsubPatients = null; }
-    patients = [];
-    showScreen("screen-auth");
+    signInAnonymously(auth).catch(console.error);
   }
 });
 
