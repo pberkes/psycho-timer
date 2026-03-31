@@ -11,6 +11,15 @@ function loadSessions(pid) {
 function saveSessions(pid, list) {
   localStorage.setItem(`pt_sessions_${pid}`, JSON.stringify(list));
 }
+function saveRunningState(pid, startTime) {
+  localStorage.setItem("pt_running", JSON.stringify({ pid, startTime }));
+}
+function clearRunningState() {
+  localStorage.removeItem("pt_running");
+}
+function loadRunningState() {
+  return JSON.parse(localStorage.getItem("pt_running") || "null");
+}
 function newId() {
   return crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
@@ -66,6 +75,15 @@ function patientTotal(pid) {
 
 // ── Boot ───────────────────────────────────────────────────────────────────
 showScreen("screen-main");
+const _savedRunning = loadRunningState();
+if (_savedRunning) {
+  runningPatientId = _savedRunning.pid;
+  runningStart     = _savedRunning.startTime;
+  tickInterval = setInterval(() => {
+    const el = $(`timer-${runningPatientId}`);
+    if (el) el.textContent = formatDuration(Math.floor((Date.now() - runningStart) / 1000));
+  }, 1000);
+}
 renderPatientList();
 
 // ── Render patient list ────────────────────────────────────────────────────
@@ -117,6 +135,7 @@ function toggleTimer(pid) {
 function startTimer(pid) {
   runningPatientId = pid;
   runningStart     = Date.now();
+  saveRunningState(pid, runningStart);
   renderPatientList();
   tickInterval = setInterval(() => {
     const el = $(`timer-${pid}`);
@@ -132,6 +151,7 @@ function stopRunningTimer() {
   const start    = runningStart;
   runningPatientId = null;
   runningStart     = null;
+  clearRunningState();
   const end      = Date.now();
   const duration = Math.floor((end - start) / 1000);
   if (duration >= 1) {
@@ -147,12 +167,14 @@ function stopRunningTimer() {
 $("btn-add-patient").addEventListener("click",    () => openPatientModal(null, ""));
 $("btn-cancel-patient").addEventListener("click", closePatientModal);
 $("btn-save-patient").addEventListener("click",   savePatient);
+$("btn-delete-patient").addEventListener("click", deletePatient);
 $("input-patient-name").addEventListener("keydown", e => { if (e.key === "Enter") savePatient(); });
 
 function openPatientModal(pid, name) {
   $("modal-patient-title").textContent = pid ? "Edit Patient" : "Add Patient";
   $("input-patient-name").value        = name || "";
   $("modal-patient").dataset.pid       = pid || "";
+  $("btn-delete-patient").classList.toggle("hidden", !pid);
   $("modal-patient").classList.remove("hidden");
   setTimeout(() => $("input-patient-name").focus(), 50);
 }
@@ -173,6 +195,19 @@ function savePatient() {
     patients.push({ id: newId(), name, createdAt: new Date().toISOString() });
   }
   savePatients(patients);
+  closePatientModal();
+  renderPatientList();
+}
+
+function deletePatient() {
+  const pid = $("modal-patient").dataset.pid;
+  if (!pid) return;
+  const p = loadPatients().find(x => x.id === pid);
+  if (!confirm(`Delete "${p ? p.name : "this patient"}" and all their sessions? This cannot be undone.`)) return;
+  if (runningPatientId === pid) { clearInterval(tickInterval); runningPatientId = null; runningStart = null; clearRunningState(); }
+  patients = loadPatients().filter(x => x.id !== pid);
+  savePatients(patients);
+  localStorage.removeItem(`pt_sessions_${pid}`);
   closePatientModal();
   renderPatientList();
 }

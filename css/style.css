@@ -189,6 +189,7 @@ main {
   z-index: 100;
 }
 .modal-overlay.hidden { display: none; }
+.hidden { display: none; }
 
 .modal {
   background: var(--surface);
