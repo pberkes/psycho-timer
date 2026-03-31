@@ -282,6 +282,7 @@ $("btn-next-month").addEventListener("click", () => {
   renderSummary();
 });
 $("btn-export-summary").addEventListener("click", exportMonthCSV);
+$("btn-export-totals").addEventListener("click",  exportTotalsCSV);
 $("btn-export-all").addEventListener("click",     exportAllCSV);
 
 function openSummary() {
@@ -340,6 +341,20 @@ function exportMonthCSV() {
   const label = new Date(summaryYear, summaryMonth, 1)
     .toLocaleDateString(undefined, { month:"long", year:"numeric" }).replace(" ", "-");
   downloadCSV(rows, `psycho-timer-${label}.csv`);
+}
+
+function exportTotalsCSV() {
+  patients = loadPatients();
+  const rows = [["Patient","Total (s)","Total (hh:mm:ss)"]];
+  for (const p of patients) {
+    const total = loadSessions(p.id).reduce((sum, s) => sum + (s.duration || 0), 0);
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = Math.floor(total % 60);
+    const hms = `${h.toString().padStart(2,"0")}:${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
+    rows.push([p.name, total, hms]);
+  }
+  downloadCSV(rows, "psycho-timer-totals.csv");
 }
 
 function exportAllCSV() {
