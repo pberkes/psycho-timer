@@ -164,10 +164,12 @@ function stopRunningTimer() {
 }
 
 // ── Patient modal ──────────────────────────────────────────────────────────
-$("btn-add-patient").addEventListener("click",    () => openPatientModal(null, ""));
-$("btn-cancel-patient").addEventListener("click", closePatientModal);
-$("btn-save-patient").addEventListener("click",   savePatient);
-$("btn-delete-patient").addEventListener("click", deletePatient);
+$("btn-add-patient").addEventListener("click",         () => openPatientModal(null, ""));
+$("btn-cancel-patient").addEventListener("click",      closePatientModal);
+$("btn-save-patient").addEventListener("click",        savePatient);
+$("btn-delete-patient").addEventListener("click",      showDeleteConfirm);
+$("btn-cancel-delete-patient").addEventListener("click", hideDeleteConfirm);
+$("btn-confirm-delete-patient").addEventListener("click", deletePatient);
 $("input-patient-name").addEventListener("keydown", e => { if (e.key === "Enter") savePatient(); });
 
 function openPatientModal(pid, name) {
@@ -181,6 +183,17 @@ function openPatientModal(pid, name) {
 
 function closePatientModal() {
   $("modal-patient").classList.add("hidden");
+  hideDeleteConfirm();
+}
+
+function showDeleteConfirm() {
+  $("patient-modal-actions").classList.add("hidden");
+  $("patient-modal-confirm").classList.remove("hidden");
+}
+
+function hideDeleteConfirm() {
+  $("patient-modal-actions").classList.remove("hidden");
+  $("patient-modal-confirm").classList.add("hidden");
 }
 
 function savePatient() {
@@ -202,8 +215,6 @@ function savePatient() {
 function deletePatient() {
   const pid = $("modal-patient").dataset.pid;
   if (!pid) return;
-  const p = loadPatients().find(x => x.id === pid);
-  if (!confirm(`Delete "${p ? p.name : "this patient"}" and all their sessions? This cannot be undone.`)) return;
   if (runningPatientId === pid) { clearInterval(tickInterval); runningPatientId = null; runningStart = null; clearRunningState(); }
   patients = loadPatients().filter(x => x.id !== pid);
   savePatients(patients);
