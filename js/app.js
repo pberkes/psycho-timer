@@ -344,17 +344,24 @@ function exportMonthCSV() {
 }
 
 function exportTotalsCSV() {
+  const monthStart = new Date(summaryYear, summaryMonth, 1).getTime();
+  const monthEnd   = new Date(summaryYear, summaryMonth + 1, 1).getTime();
   patients = loadPatients();
   const rows = [["Patient","Total (s)","Total (hh:mm:ss)"]];
   for (const p of patients) {
-    const total = loadSessions(p.id).reduce((sum, s) => sum + (s.duration || 0), 0);
+    const total = loadSessions(p.id).reduce((sum, s) => {
+      const t = new Date(s.startTime).getTime();
+      return (t >= monthStart && t < monthEnd) ? sum + (s.duration || 0) : sum;
+    }, 0);
     const h = Math.floor(total / 3600);
     const m = Math.floor((total % 3600) / 60);
     const s = Math.floor(total % 60);
     const hms = `${h.toString().padStart(2,"0")}:${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
     rows.push([p.name, total, hms]);
   }
-  downloadCSV(rows, "psycho-timer-totals.csv");
+  const label = new Date(summaryYear, summaryMonth, 1)
+    .toLocaleDateString(undefined, { month:"long", year:"numeric" }).replace(" ", "-");
+  downloadCSV(rows, `psycho-timer-totals-${label}.csv`);
 }
 
 function exportAllCSV() {
