@@ -176,7 +176,7 @@ function openPatientModal(pid, name) {
   $("modal-patient-title").textContent = pid ? "Edit Patient" : "Add Patient";
   $("input-patient-name").value        = name || "";
   $("modal-patient").dataset.pid       = pid || "";
-  $("btn-delete-patient").classList.toggle("hidden", !pid);
+  $("btn-delete-patient").style.display = pid ? "" : "none";
   $("modal-patient").classList.remove("hidden");
   setTimeout(() => $("input-patient-name").focus(), 50);
 }
@@ -187,13 +187,13 @@ function closePatientModal() {
 }
 
 function showDeleteConfirm() {
-  $("patient-modal-actions").classList.add("hidden");
-  $("patient-modal-confirm").classList.remove("hidden");
+  $("patient-modal-actions").style.display = "none";
+  $("patient-modal-confirm").style.display = "";
 }
 
 function hideDeleteConfirm() {
-  $("patient-modal-actions").classList.remove("hidden");
-  $("patient-modal-confirm").classList.add("hidden");
+  $("patient-modal-actions").style.display = "";
+  $("patient-modal-confirm").style.display = "none";
 }
 
 function savePatient() {

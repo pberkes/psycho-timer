@@ -64,11 +64,11 @@
       <input id="input-patient-name" type="text" placeholder="Patient nickname or ID" />
       <div class="modal-actions" id="patient-modal-actions">
         <button id="btn-cancel-patient" class="btn btn-ghost">Cancel</button>
-        <button id="btn-delete-patient" class="btn btn-danger hidden">Delete</button>
+        <button id="btn-delete-patient" class="btn btn-danger" style="display:none">Delete</button>
         <button id="btn-save-patient" class="btn btn-primary">Save</button>
       </div>
-      <div class="modal-actions hidden" id="patient-modal-confirm">
-        <span style="font-size:.85rem;color:var(--text-muted)">Delete all sessions too?</span>
+      <div class="modal-actions" id="patient-modal-confirm" style="display:none">
+        <span style="font-size:.85rem;color:var(--text-muted)">Are you sure?</span>
         <button id="btn-cancel-delete-patient" class="btn btn-ghost">No</button>
         <button id="btn-confirm-delete-patient" class="btn btn-danger">Yes, delete</button>
       </div>
